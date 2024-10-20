@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getFirestore, collection, addDoc, getDocs, Timestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid'; // Make sure to install this package: npm install uuid
+import { v4 as uuidv4 } from 'uuid';
 
 function CreateOrder() {
   const [menuItems, setMenuItems] = useState([]);
@@ -46,7 +46,7 @@ function CreateOrder() {
       .filter(([_, quantity]) => quantity > 0)
       .map(([itemId, quantity]) => {
         const menuItem = menuItems.find(item => item.id === itemId);
-        // Only include the necessary fields in menuItem, matching the mobile app structure
+
         return {
           menuItem: {
             category: menuItem.category,
@@ -64,7 +64,7 @@ function CreateOrder() {
     }
 
     const order = {
-      id: uuidv4().toUpperCase(), // Generate a UUID and convert to uppercase to match the mobile app format
+      id: uuidv4().toUpperCase(), 
       userId: auth.currentUser ? auth.currentUser.uid : null,
       userName: userEmail,
       items: orderItems,
