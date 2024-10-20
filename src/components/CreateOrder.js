@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, Timestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid'; // Make sure to install this package: npm install uuid
 
 function CreateOrder() {
   const [menuItems, setMenuItems] = useState([]);
@@ -13,7 +14,6 @@ function CreateOrder() {
 
   useEffect(() => {
     fetchMenuItems();
-    // Set the current user's email as default
     if (auth.currentUser) {
       setUserEmail(auth.currentUser.email);
     }
@@ -46,7 +46,16 @@ function CreateOrder() {
       .filter(([_, quantity]) => quantity > 0)
       .map(([itemId, quantity]) => {
         const menuItem = menuItems.find(item => item.id === itemId);
-        return { menuItem, quantity };
+        // Only include the necessary fields in menuItem, matching the mobile app structure
+        return {
+          menuItem: {
+            category: menuItem.category,
+            description: menuItem.description,
+            name: menuItem.name,
+            price: menuItem.price
+          },
+          quantity
+        };
       });
 
     if (orderItems.length === 0) {
@@ -55,10 +64,11 @@ function CreateOrder() {
     }
 
     const order = {
+      id: uuidv4().toUpperCase(), // Generate a UUID and convert to uppercase to match the mobile app format
       userId: auth.currentUser ? auth.currentUser.uid : null,
       userName: userEmail,
       items: orderItems,
-      date: new Date(),
+      date: Timestamp.now(),
       isPaid: false
     };
 
